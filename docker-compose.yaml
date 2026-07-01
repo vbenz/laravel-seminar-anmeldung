@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mariadb:10.5
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE:-seminar-db}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    expose:
+      - 3306
+    ports:
+      - 3309:3306
+    networks:
+      - seminar-anmeldung
+
+networks:
+  seminar-anmeldung:
+
+volumes:
+  db_data:
